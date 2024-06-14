@@ -12,35 +12,43 @@ const app = express();
 const port = process.env.PORT || 8080;
 
 app.use(express.json());
-
 app.use(cors());
 
 connectMongoDB();
 
 app.get("/register", function (req, res) {
-  res.render("register");
+  res.send("register");
 });
 
 app.post("/register", async (req, res) => {
   const user = await User.create({
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
     email: req.body.email,
+    mobile: req.body.mobile,
     password: req.body.password,
+    employeeId: req.body.employeeId,
   });
 
   return res.status(200).json(user);
 });
 
-app.get("/login", (req, res) => {
-  res.send("login");
+app.get("/users", async (req, res) => {
+  try {
+    const users = await User.find({});
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching users" });
+  }
 });
 
 app.post("/login", async function (req, res) {
   try {
-    const user = await User.findOne({ username: req.body.username });
+    const user = await User.findOne({ email: req.body.email });
     if (user) {
       const result = req.body.password === user.password;
       if (result) {
-        res.render("secret");
+        res.send("secret");
       } else {
         res.status(400).json({ error: "password doesn't match" });
       }
