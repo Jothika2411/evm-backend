@@ -16,6 +16,10 @@ connectMongoDB();
 
 app.use("/api", routes)
 
+app.use("/", (req, res)=>{
+  res.send("Server is running")
+})
+
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
