@@ -6,11 +6,10 @@ const errorMessages = {
 };
 
 const createEvent = async (req, res) => {
- 
   try {
     const eventData = req.body;
     const newEvent = await Event.create(eventData);
-    res.status(201).json(newEvent);
+    res.status(200).json({newEvent});
   } catch (error) {
     res.status(400).json({ error });
   }
@@ -18,7 +17,7 @@ const createEvent = async (req, res) => {
 
 const getAllEvents = async (req, res) => {
   try {
-    const events = await Event.find({});
+    const events = await Event.find({}).populate("venue");
     res.status(200).json({ events });
   } catch (error) {
     console.error("Error in getting events", error);
@@ -30,7 +29,7 @@ const getAllEventsById = async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
     if (!event) {
-      return res.status(404).json({ error: "Event not found" });
+      return res.status(404).json(errorMessages.NOT_FOUND);
     }
     res.status(200).json(event);
   } catch (error) {
@@ -39,7 +38,6 @@ const getAllEventsById = async (req, res) => {
   }
 };
 
-
 const updateEvent = async (req, res) => {
   try {
     const updatedEvent = await Event.findByIdAndUpdate(
@@ -47,8 +45,7 @@ const updateEvent = async (req, res) => {
       req.body,
       { new: true, runValidators: true }
     );
-    if (!updatedEvent)
-      return res.status(404).json({ message: "Event not found" });
+    if (!updatedEvent) return res.status(404).json(errorMessages.NOT_FOUND);
     res.status(200).json(updatedEvent);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -58,7 +55,7 @@ const updateEvent = async (req, res) => {
 const deleteEvent = async (req, res) => {
   try {
     const event = await Event.findByIdAndDelete(req.params.id);
-    if (!event) return res.status(404).json({ message: "Event not found" });
+    if (!event) return res.status(404).json(errorMessages.NOT_FOUND);
     res.status(200).json({ message: "Event deleted" });
   } catch (error) {
     res.status(500).json({ message: error.message });

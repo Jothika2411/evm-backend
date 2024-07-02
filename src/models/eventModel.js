@@ -6,12 +6,16 @@ const eventSchema = mongoose.Schema({
     trim: true,
   },
   venue: {
-    type: String,
-    trim: true,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Venue",
   },
   date: {
     type: Date,
     trim: true,
+  },
+  time: {
+    from: { type: String },
+    to: { type: String },
   },
 });
 
